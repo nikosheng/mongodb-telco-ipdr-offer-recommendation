@@ -121,8 +121,8 @@ export const updateUserProfile = async (msisdn, options = { forceUpdate: false }
       // 3. Generate Summary and Embedding
       const { summary, embedding, tags } = await generateUserSummaryAndEmbedding(historyText);
       
-      updateFields.latestAcvititySummary = summary;
-      updateFields.latestAcvititySummaryEmbedding = embedding;
+      updateFields.latestActivitySummary = summary;
+      updateFields.latestActivitySummaryEmbedding = embedding;
       updateFields.lastSummaryUpdate = now;
       if (tags && tags.length > 0) {
         updateFields.tags = tags;

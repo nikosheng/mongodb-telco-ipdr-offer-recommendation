@@ -13,8 +13,8 @@ const UserSchema = new mongoose.Schema({
     ref: 'Ipdr'
   }],
   // Summary of activity and preference
-  latestAcvititySummary: String,
-  latestAcvititySummaryEmbedding: [Number],
+  latestActivitySummary: String,
+  latestActivitySummaryEmbedding: [Number],
   lastSummaryUpdate: Date,
   // Generated tags based on history
   tags: [{type: String}]

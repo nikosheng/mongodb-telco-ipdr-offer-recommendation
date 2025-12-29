@@ -20,7 +20,7 @@ export const recommendOffers = async (userId) => {
     }
 
     // Use the latest summary embedding for recommendation
-    const queryVector = user.latestAcvititySummaryEmbedding;
+    const queryVector = user.latestActivitySummaryEmbedding;
 
     if (!queryVector || queryVector.length === 0) {
         console.log("User has no activity embedding for vector search.");

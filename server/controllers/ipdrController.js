@@ -53,7 +53,12 @@ export const getIpdrData = async (req, res) => {
       return res.status(200).json({ 
         success: true, 
         data: activitiesWithNames, 
-        user: { msisdn: user.msisdn, name: user.name, tags: user.tags } 
+        user: { 
+          msisdn: user.msisdn, 
+          name: user.name, 
+          tags: user.tags,
+          latestActivitySummary: user.latestActivitySummary 
+        } 
       });
     }
 

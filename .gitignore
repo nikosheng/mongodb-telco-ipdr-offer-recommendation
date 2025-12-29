@@ -34,3 +34,6 @@ client/dist/
 
 # Server specific
 server/node_modules/
+
+# Customized scripts
+migrate_rename_fields.js

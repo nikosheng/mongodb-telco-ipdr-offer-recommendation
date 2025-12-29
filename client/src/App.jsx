@@ -54,6 +54,22 @@ function App() {
     }
   };
 
+  const formatBytes = (bytes) => {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  const formatDuration = (seconds) => {
+    if (!seconds) return '0s';
+    if (seconds < 60) return `${seconds}s`;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchMsisdn.trim()) {
@@ -186,6 +202,42 @@ function App() {
             </form>
           </div>
 
+          {/* User Insight Section */}
+          {selectedUser && (
+            <div className="px-2">
+              <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-blue-600 rounded-lg text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-xs font-bold text-blue-900 uppercase tracking-wider">User Activity Insight</h2>
+                </div>
+                
+                {selectedUser.latestActivitySummary ? (
+                  <p className="text-s text-blue-800 leading-relaxed mb-4 italic">
+                    "{selectedUser.latestActivitySummary}"
+                  </p>
+                ) : (
+                  <p className="text-xs text-blue-400 leading-relaxed mb-4 italic">
+                    No activity summary available yet.
+                  </p>
+                )}
+
+                {selectedUser.tags && selectedUser.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedUser.tags.map((tag, idx) => (
+                      <span key={idx} className="px-2 py-0.5 bg-white/60 text-[9px] font-bold text-blue-700 rounded-full border border-blue-200 uppercase tracking-tight">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col gap-1 px-2">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -252,26 +304,66 @@ function App() {
           </div>
 
           {/* Analytics Overview */}
-          <section className="pt-4 border-t border-gray-100">
+          <section className="pt-4 border-t border-gray-100 pb-8">
             <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-2 mb-4">
               {selectedUser ? `Latest 10 Activities for +${selectedUser.msisdn}` : 'Recent Analytics'}
             </h2>
             <div className="space-y-3">
               {ipdrData.slice(0, selectedUser ? 10 : 5).map((log, i) => (
-                <div key={i} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-[10px]">
-                    {log.userName ? log.userName.charAt(0) : (log.msisdn ? log.msisdn.slice(-2) : '??')}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start">
-                      <p className="text-xs font-black text-gray-900 truncate">
-                        {log.userName || `+${log.msisdn}`}
-                      </p>
-                      <span className="text-[9px] font-bold text-gray-400 shrink-0">
-                        {new Date(log.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                      </span>
+                <div key={i} className="group flex flex-col gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-indigo-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-[10px] group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                      {log.userName ? log.userName.charAt(0) : (log.msisdn ? log.msisdn.slice(-2) : '??')}
                     </div>
-                    <p className="text-[10px] text-gray-500 font-medium truncate">{log.serviceType}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <p className="text-xs font-black text-gray-900 truncate">
+                          {log.userName || `+${log.msisdn}`}
+                        </p>
+                        <span className="text-[9px] font-bold text-gray-400 shrink-0">
+                          {new Date(log.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-indigo-600 font-bold truncate uppercase tracking-tighter">{log.serviceType}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-1 pl-11 space-y-1.5">
+                    {log.url && (
+                      <div className="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                        <p className="text-[9px] text-gray-500 font-medium truncate break-all">{log.url}</p>
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-[9px] text-gray-400 font-bold">{formatDuration(log.duration)}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                        </svg>
+                        <span className="text-[9px] text-gray-400 font-bold">{formatBytes((log.downloadVolume || 0) + (log.uploadVolume || 0))}</span>
+                      </div>
+                    </div>
+
+                    {log.location && (
+                      <div className="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span className="text-[9px] text-gray-400 font-medium">
+                          {log.location.city}{log.location.district ? `, ${log.location.district}` : ''}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
