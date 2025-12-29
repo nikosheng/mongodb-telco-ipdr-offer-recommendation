@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@layer base {
+  .leaflet-popup-content-wrapper {
+    @apply !rounded-xl !shadow-2xl !border !border-gray-100 !p-0 overflow-hidden;
+  }
+  
+  .leaflet-popup-content {
+    @apply !m-0 !w-auto;
+  }
+  
+  .leaflet-popup-tip {
+    @apply !shadow-none !border !border-gray-100;
+  }
+
+  .custom-popup .leaflet-popup-content-wrapper {
+    @apply bg-white/95 backdrop-blur-sm;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
