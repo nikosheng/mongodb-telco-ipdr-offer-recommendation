@@ -46,7 +46,8 @@ export const getIpdrData = async (req, res) => {
         const obj = act.toObject();
         return {
           ...obj,
-          userName: user.name
+          userName: user.name,
+          userTags: user.tags
         };
       });
 
@@ -75,7 +76,8 @@ export const getIpdrData = async (req, res) => {
         },
         {
             $addFields: {
-                userName: { $arrayElemAt: ["$userInfo.name", 0] }
+                userName: { $arrayElemAt: ["$userInfo.name", 0] },
+                userTags: { $arrayElemAt: ["$userInfo.tags", 0] }
             }
         },
         { $project: { userInfo: 0 } }

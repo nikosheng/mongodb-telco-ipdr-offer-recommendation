@@ -126,6 +126,15 @@ function App() {
             <div className="space-y-1 mb-2">
                <p className="text-[10px] text-gray-500 font-medium">Activity: <span className="text-gray-900">{item.serviceType}</span></p>
                <p className="text-[10px] text-gray-500 font-medium">Time: <span className="text-gray-900">{new Date(item.timestamp).toLocaleTimeString()}</span></p>
+               {item.userTags && item.userTags.length > 0 && (
+                 <div className="flex flex-wrap gap-1 mt-1">
+                   {item.userTags.slice(0, 3).map((tag, tIdx) => (
+                     <span key={tIdx} className="px-1.5 py-0.5 bg-blue-50 text-[8px] font-bold text-blue-600 rounded uppercase">
+                       #{tag}
+                     </span>
+                   ))}
+                 </div>
+               )}
             </div>
             {!selectedUser && (
               <button 
@@ -362,6 +371,16 @@ function App() {
                         <span className="text-[9px] text-gray-400 font-medium">
                           {log.location.city}{log.location.district ? `, ${log.location.district}` : ''}
                         </span>
+                      </div>
+                    )}
+
+                    {log.userTags && log.userTags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {log.userTags.slice(0, 3).map((tag, tIdx) => (
+                          <span key={tIdx} className="px-1.5 py-0.5 bg-blue-50 text-[8px] font-bold text-blue-600 rounded uppercase">
+                            #{tag}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
