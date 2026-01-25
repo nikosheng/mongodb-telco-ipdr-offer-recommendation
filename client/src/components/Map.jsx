@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import OfferDashboard from './OfferDashboard';
 
 // Component to handle map re-centering
 function ChangeView({ center, zoom }) {
@@ -43,6 +44,7 @@ const createPulseIcon = (msisdn, isLatest) => {
 const Map = ({ markers, center }) => {
   return (
     <div className="h-full w-full relative">
+      <OfferDashboard />
       <MapContainer 
         center={center} 
         zoom={13} 

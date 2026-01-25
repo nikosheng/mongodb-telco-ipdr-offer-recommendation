@@ -5,6 +5,8 @@ import cors from 'cors';
 
 import ipdrRoutes from './routes/ipdrRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
+import offerPushLogRoutes from './routes/offerPushLogRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -22,6 +24,8 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/ipdr', ipdrRoutes);
 app.use('/api/offers', offerRoutes);
+app.use('/api/push-logs', offerPushLogRoutes);
+app.use('/api/users', userRoutes);
 
 // Database Connection
 const connectDB = async () => {

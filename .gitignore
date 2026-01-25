@@ -37,3 +37,5 @@ server/node_modules/
 
 # Customized scripts
 migrate_rename_fields.js
+LLM_COST_ESTIMATION.md
+mermaid_chart

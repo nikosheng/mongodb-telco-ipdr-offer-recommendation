@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Map from './components/Map';
-import { getIpdrData, getRecommendations, getOffers } from './services/api';
+import { getIpdrData, getRecommendations, getOffers, getSimilarUsers } from './services/api';
 
 function App() {
   const [ipdrData, setIpdrData] = useState([]);
   const [offers, setOffers] = useState([]);
+  const [similarUsers, setSimilarUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null); // Now stores { msisdn, name, tags }
   const [searchMsisdn, setSearchMsisdn] = useState('');
   const [mapCenter, setMapCenter] = useState([22.3193, 114.1694]); // HK
@@ -35,8 +36,14 @@ function App() {
           if (recRes.data.success) {
             setOffers(recRes.data.data);
           }
+          // Fetch similar users
+          const simRes = await getSimilarUsers(res.data.user.msisdn);
+          if (simRes.data.success) {
+            setSimilarUsers(simRes.data.data);
+          }
         } else {
           setSelectedUser(null);
+          setSimilarUsers([]);
           if (name) {
              fetchInitialOffers();
           }
@@ -243,6 +250,54 @@ function App() {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Similar Users Section */}
+          {selectedUser && similarUsers.length > 0 && (
+            <div className="px-2">
+              <div className="bg-indigo-50 rounded-2xl p-4 border border-indigo-100 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-indigo-600 rounded-lg text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Similar Behavior Users</h2>
+                </div>
+                <div className="space-y-3">
+                  {similarUsers.map((user, idx) => (
+                    <div 
+                      key={idx} 
+                      className="flex items-center gap-3 p-2 bg-white/60 rounded-xl border border-indigo-100 cursor-pointer hover:bg-white transition-all group"
+                      onClick={() => {
+                        setSearchMsisdn(user.msisdn);
+                        fetchIpdr(user.msisdn);
+                      }}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        {user.name ? user.name.charAt(0) : user.msisdn.slice(-2)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center">
+                          <p className="text-xs font-bold text-gray-900 truncate">{user.name || `+${user.msisdn}`}</p>
+                          <span className="text-[9px] font-black text-indigo-500 uppercase">{Math.round(user.score * 100)}%</span>
+                        </div>
+                        <p className="text-[10px] text-gray-500 leading-relaxed">{user.latestActivitySummary || 'No summary available'}</p>
+                        {user.sharedTags && user.sharedTags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {user.sharedTags.map((tag, tIdx) => (
+                              <span key={tIdx} className="px-1 py-0 bg-indigo-100 text-[8px] font-bold text-indigo-600 rounded uppercase">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
