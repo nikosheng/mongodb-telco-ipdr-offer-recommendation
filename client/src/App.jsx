@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Map from './components/Map';
+import ChatWidget from './components/ChatWidget';
 import { getIpdrData, getRecommendations, getOffers, getSimilarUsers } from './services/api';
 
 function App() {
@@ -474,6 +475,8 @@ function App() {
           </div>
         </div>
       </main>
+
+      <ChatWidget />
     </div>
   );
 }

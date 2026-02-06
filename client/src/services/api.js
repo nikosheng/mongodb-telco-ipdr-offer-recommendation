@@ -42,3 +42,7 @@ export const getPushLogSummary = async (date) => {
     params: { date }
   });
 };
+
+export const sendChatMessage = async (messages) => {
+  return axios.post(`${API_URL}/chat`, { messages });
+};

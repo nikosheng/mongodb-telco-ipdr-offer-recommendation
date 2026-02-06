@@ -8,9 +8,8 @@ dotenv.config();
 
 const generateMockData = async () => {
   try {
-    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/telco-ipdr';
-    await mongoose.connect(uri);
-    console.log('MongoDB Connected to:', uri);
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('MongoDB Connected to:', process.env.MONGODB_URI);
 
     // 1. Get existing Offers
     let offers = await Offer.find({});

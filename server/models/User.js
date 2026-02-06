@@ -22,4 +22,4 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.index({ currentLocation: "2dsphere" });
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.models.User || mongoose.model('User', UserSchema);

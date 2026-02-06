@@ -7,6 +7,7 @@ import ipdrRoutes from './routes/ipdrRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
 import offerPushLogRoutes from './routes/offerPushLogRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/api/ipdr', ipdrRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/push-logs', offerPushLogRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Database Connection
 const connectDB = async () => {

@@ -28,4 +28,4 @@ const IpdrSchema = new mongoose.Schema({
 IpdrSchema.index({ "location.coordinates": "2dsphere" });
 IpdrSchema.index({ msisdn: 1, duration: -1 }); // Index for querying top duration by user
 
-export default mongoose.model('Ipdr', IpdrSchema);
+export default mongoose.models.Ipdr || mongoose.model('Ipdr', IpdrSchema);

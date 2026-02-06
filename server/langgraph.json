@@ -1,0 +1,6 @@
+{
+  "graphs": {
+    "agent": "./services/agentService.js:graph"
+  },
+  "env": ".env"
+}

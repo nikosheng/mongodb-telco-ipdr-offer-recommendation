@@ -7,4 +7,4 @@ const OfferSchema = new mongoose.Schema({
   tags: [{type: String}]
 });
 
-export default mongoose.model('Offer', OfferSchema);
+export default mongoose.models.Offer || mongoose.model('Offer', OfferSchema);
