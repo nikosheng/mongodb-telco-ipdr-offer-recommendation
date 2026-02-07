@@ -58,7 +58,8 @@ export const getIpdrData = async (req, res) => {
           msisdn: user.msisdn, 
           name: user.name, 
           tags: user.tags,
-          latestActivitySummary: user.latestActivitySummary 
+          latestActivitySummary: user.latestActivitySummary,
+          customerJourney: user.customerJourney || []
         } 
       });
     }

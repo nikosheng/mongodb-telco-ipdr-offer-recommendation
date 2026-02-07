@@ -17,7 +17,15 @@ const UserSchema = new mongoose.Schema({
   latestActivitySummaryEmbedding: [Number],
   lastSummaryUpdate: Date,
   // Generated tags based on history
-  tags: [{type: String}]
+  tags: [{type: String}],
+  // Customer Journey / Purchase History
+  customerJourney: [{
+    action: { type: String, enum: ['pushed', 'viewed', 'purchased'], required: true },
+    offerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Offer' },
+    offerName: String,
+    timestamp: { type: Date, default: Date.now },
+    details: String
+  }]
 });
 
 UserSchema.index({ currentLocation: "2dsphere" });

@@ -207,7 +207,23 @@ const fulfillmentTool = tool(
       });
       await log.save();
 
-      return `Successfully sent offer "${offerName}" (ID: ${offerId}) to user ${msisdn}. Logged in audit-logs.`;
+      // 3. Update User's Customer Journey
+      await User.findOneAndUpdate(
+        { msisdn },
+        {
+          $push: {
+            customerJourney: {
+              action: 'pushed',
+              offerId: offerId,
+              offerName: offerName,
+              timestamp: new Date(),
+              details: 'Sent via AI Agent'
+            }
+          }
+        }
+      );
+
+      return `Successfully sent offer "${offerName}" (ID: ${offerId}) to user ${msisdn}. Logged in audit-logs and updated customer journey.`;
     } catch (error) {
       console.error("Fulfillment Tool Error:", error);
       return `Error sending offer: ${error.message}`;

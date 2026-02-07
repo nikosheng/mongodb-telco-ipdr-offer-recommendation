@@ -34,6 +34,7 @@ client/dist/
 
 # Server specific
 server/node_modules/
+server/logs/
 
 # Customized scripts
 migrate_rename_fields.js

@@ -255,6 +255,53 @@ function App() {
             </div>
           )}
 
+          {/* Customer Journey Section */}
+          {selectedUser && selectedUser.customerJourney && selectedUser.customerJourney.length > 0 && (
+            <div className="px-2">
+              <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-purple-600 rounded-lg text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <h2 className="text-xs font-bold text-purple-900 uppercase tracking-wider">Customer Journey</h2>
+                </div>
+                
+                <div className="relative pl-4 border-l-2 border-purple-200 space-y-6 my-2">
+                  {selectedUser.customerJourney.slice().reverse().map((event, idx) => (
+                    <div key={idx} className="relative">
+                      {/* Timeline dot */}
+                      <div className={`absolute -left-[21px] top-1 w-3 h-3 rounded-full border-2 border-white shadow-sm ${
+                        event.action === 'purchased' ? 'bg-green-500' : 
+                        event.action === 'viewed' ? 'bg-blue-500' : 'bg-purple-500'
+                      }`}></div>
+                      
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between items-start">
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                            event.action === 'purchased' ? 'bg-green-100 text-green-700' : 
+                            event.action === 'viewed' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            {event.action}
+                          </span>
+                          <span className="text-[9px] text-gray-400 font-medium">
+                            {new Date(event.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        
+                        <p className="text-xs font-bold text-gray-800">{event.offerName || 'Unknown Offer'}</p>
+                        {event.details && (
+                          <p className="text-[10px] text-gray-500 leading-tight">{event.details}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Similar Users Section */}
           {selectedUser && similarUsers.length > 0 && (
             <div className="px-2">
