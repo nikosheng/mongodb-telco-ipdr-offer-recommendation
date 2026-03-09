@@ -1,0 +1,801 @@
+[dotenv@17.2.3] injecting env (14) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+Listing tools...
+{
+  "tools": [
+    {
+      "name": "aggregate",
+      "description": "Run an aggregation against a MongoDB collection",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name"
+          },
+          "pipeline": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": true
+            },
+            "description": "An array of aggregation stages to execute."
+          },
+          "responseBytesLimit": {
+            "type": "number",
+            "default": 1048576,
+            "description": "The maximum number of bytes to return in the response. This value is capped by the server's configured maxBytesPerQuery and cannot be exceeded. Note to LLM: If the entire aggregation result is required, use the \"export\" tool instead of increasing this limit."
+          }
+        },
+        "required": [
+          "database",
+          "collection",
+          "pipeline"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "aggregate",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "collection-indexes",
+      "description": "Describe the indexes for a collection",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name"
+          }
+        },
+        "required": [
+          "database",
+          "collection"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "collection-indexes",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "collection-schema",
+      "description": "Describe the schema for a collection",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name"
+          },
+          "sampleSize": {
+            "type": "number",
+            "default": 50,
+            "description": "Number of documents to sample for schema inference"
+          },
+          "responseBytesLimit": {
+            "type": "number",
+            "default": 1048576,
+            "description": "The maximum number of bytes to return in the response. This value is capped by the server's configured maxBytesPerQuery and cannot be exceeded."
+          }
+        },
+        "required": [
+          "database",
+          "collection"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "collection-schema",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "collection-storage-size",
+      "description": "Gets the size of the collection",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name"
+          }
+        },
+        "required": [
+          "database",
+          "collection"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "collection-storage-size",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "connect",
+      "description": "Connect to a MongoDB instance. The config resource captures if the server is already connected to a MongoDB cluster. If the user has configured a connection string or has previously called the connect tool, a connection is already established and there's no need to call this tool unless the user has explicitly requested to switch to a new MongoDB cluster.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "connectionString": {
+            "type": "string",
+            "description": "MongoDB connection string (in the mongodb:// or mongodb+srv:// format)"
+          }
+        },
+        "required": [
+          "connectionString"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "connect",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "count",
+      "description": "Gets the number of documents in a MongoDB collection using db.collection.count() and query as an optional filter parameter",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name"
+          },
+          "query": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true,
+            "description": "A filter/query parameter. Allows users to filter the documents to count. Matches the syntax of the filter argument of db.collection.count()."
+          }
+        },
+        "required": [
+          "database",
+          "collection"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "count",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "db-stats",
+      "description": "Returns statistics that reflect the use state of a single database",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          }
+        },
+        "required": [
+          "database"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "db-stats",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "explain",
+      "description": "Returns statistics describing the execution of the winning plan chosen by the query optimizer for the evaluated method",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name"
+          },
+          "method": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "const": "aggregate"
+                    },
+                    "arguments": {
+                      "type": "object",
+                      "properties": {
+                        "pipeline": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": true
+                          },
+                          "description": "An array of aggregation stages to execute."
+                        }
+                      },
+                      "required": [
+                        "pipeline"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "arguments"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "const": "find"
+                    },
+                    "arguments": {
+                      "type": "object",
+                      "properties": {
+                        "filter": {
+                          "type": "object",
+                          "properties": {},
+                          "additionalProperties": true,
+                          "description": "The query filter, matching the syntax of the query argument of db.collection.find()"
+                        },
+                        "projection": {
+                          "type": "object",
+                          "properties": {},
+                          "additionalProperties": true,
+                          "description": "The projection, matching the syntax of the projection argument of db.collection.find()"
+                        },
+                        "limit": {
+                          "type": "number",
+                          "default": 10,
+                          "description": "The maximum number of documents to return"
+                        },
+                        "sort": {
+                          "type": "object",
+                          "properties": {},
+                          "additionalProperties": {},
+                          "description": "A document, describing the sort order, matching the syntax of the sort argument of cursor.sort(). The keys of the object are the fields to sort on, while the values are the sort directions (1 for ascending, -1 for descending)."
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "arguments"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "const": "count"
+                    },
+                    "arguments": {
+                      "type": "object",
+                      "properties": {
+                        "query": {
+                          "type": "object",
+                          "properties": {},
+                          "additionalProperties": true,
+                          "description": "A filter/query parameter. Allows users to filter the documents to count. Matches the syntax of the filter argument of db.collection.count()."
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "arguments"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "description": "The method and its arguments to run"
+          },
+          "verbosity": {
+            "type": "string",
+            "enum": [
+              "queryPlanner",
+              "queryPlannerExtended",
+              "executionStats",
+              "allPlansExecution"
+            ],
+            "default": "queryPlanner",
+            "description": "The verbosity of the explain plan, defaults to queryPlanner. If the user wants to know how fast is a query in execution time, use executionStats. It supports all verbosities as defined in the MongoDB Driver."
+          }
+        },
+        "required": [
+          "database",
+          "collection",
+          "method"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "explain",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "export",
+      "description": "Export a query or aggregation results in the specified EJSON format.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name"
+          },
+          "exportTitle": {
+            "type": "string",
+            "description": "A short description to uniquely identify the export."
+          },
+          "exportTarget": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "const": "find",
+                      "description": "The literal name 'find' to represent a find cursor as target."
+                    },
+                    "arguments": {
+                      "type": "object",
+                      "properties": {
+                        "filter": {
+                          "type": "object",
+                          "properties": {},
+                          "additionalProperties": true,
+                          "description": "The query filter, matching the syntax of the query argument of db.collection.find()"
+                        },
+                        "projection": {
+                          "type": "object",
+                          "properties": {},
+                          "additionalProperties": true,
+                          "description": "The projection, matching the syntax of the projection argument of db.collection.find()"
+                        },
+                        "limit": {
+                          "type": "number"
+                        },
+                        "sort": {
+                          "type": "object",
+                          "properties": {},
+                          "additionalProperties": {},
+                          "description": "A document, describing the sort order, matching the syntax of the sort argument of cursor.sort(). The keys of the object are the fields to sort on, while the values are the sort directions (1 for ascending, -1 for descending)."
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "The arguments for 'find' operation."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "arguments"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "const": "aggregate",
+                      "description": "The literal name 'aggregate' to represent an aggregation cursor as target."
+                    },
+                    "arguments": {
+                      "type": "object",
+                      "properties": {
+                        "pipeline": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": true
+                          },
+                          "description": "An array of aggregation stages to execute."
+                        }
+                      },
+                      "required": [
+                        "pipeline"
+                      ],
+                      "additionalProperties": false,
+                      "description": "The arguments for 'aggregate' operation."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "arguments"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "description": "The export target along with its arguments."
+          },
+          "jsonExportFormat": {
+            "type": "string",
+            "enum": [
+              "relaxed",
+              "canonical"
+            ],
+            "default": "relaxed",
+            "description": "The format to be used when exporting collection data as EJSON with default being relaxed.\nrelaxed: A string format that emphasizes readability and interoperability at the expense of type preservation. That is, conversion from relaxed format to BSON can lose type information.\ncanonical: A string format that emphasizes type preservation at the expense of readability and interoperability. That is, conversion from canonical to BSON will generally preserve type information except in certain specific cases."
+          }
+        },
+        "required": [
+          "database",
+          "collection",
+          "exportTitle",
+          "exportTarget"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "export",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "find",
+      "description": "Run a find query against a MongoDB collection",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name"
+          },
+          "filter": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true,
+            "description": "The query filter, matching the syntax of the query argument of db.collection.find()"
+          },
+          "projection": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true,
+            "description": "The projection, matching the syntax of the projection argument of db.collection.find()"
+          },
+          "limit": {
+            "type": "number",
+            "default": 10,
+            "description": "The maximum number of documents to return"
+          },
+          "sort": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {},
+            "description": "A document, describing the sort order, matching the syntax of the sort argument of cursor.sort(). The keys of the object are the fields to sort on, while the values are the sort directions (1 for ascending, -1 for descending)."
+          },
+          "responseBytesLimit": {
+            "type": "number",
+            "default": 1048576,
+            "description": "The maximum number of bytes to return in the response. This value is capped by the server's configured maxBytesPerQuery and cannot be exceeded. Note to LLM: If the entire query result is required, use the \"export\" tool instead of increasing this limit."
+          }
+        },
+        "required": [
+          "database",
+          "collection"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "find",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "list-collections",
+      "description": "List all collections for a given database",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "Database name"
+          }
+        },
+        "required": [
+          "database"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "list-collections",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "list-databases",
+      "description": "List all databases for a MongoDB connection",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "databases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "size": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "size"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "totalCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "databases",
+          "totalCount"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "list-databases",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "mongodb-logs",
+      "description": "Returns the most recent logged mongod events",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "global",
+              "startupWarnings"
+            ],
+            "default": "global",
+            "description": "The type of logs to return. Global returns all recent log entries, while startupWarnings returns only warnings and errors from when the process started."
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 1024,
+            "minimum": 1,
+            "default": 50,
+            "description": "The maximum number of log entries to return."
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "mongodb-logs",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "atlas-local-connect-deployment",
+      "description": "Connect to a MongoDB Atlas Local deployment",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "deploymentName": {
+            "type": "string",
+            "pattern": "^[\\x20-\\x7E]*$",
+            "description": "Name of the deployment to connect to"
+          }
+        },
+        "required": [
+          "deploymentName"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "atlas-local-connect-deployment",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    },
+    {
+      "name": "atlas-local-list-deployments",
+      "description": "List MongoDB Atlas local deployments",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "atlas-local-list-deployments",
+        "readOnlyHint": true,
+        "destructiveHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "com.mongodb/transport": "http",
+        "com.mongodb/maxRequestPayloadBytes": 102400
+      }
+    }
+  ]
+}

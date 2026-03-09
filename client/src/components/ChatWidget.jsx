@@ -3,6 +3,54 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { sendChatMessage } from '../services/api';
 
+const assistantComponents = {
+  // Table styles
+  table: ({node, ...props}) => (
+    <div className="overflow-x-auto my-2 rounded-lg border border-gray-200 shadow-sm">
+      <table className="min-w-full divide-y divide-gray-200 bg-white" {...props} />
+    </div>
+  ),
+  thead: ({node, ...props}) => <thead className="bg-gray-50" {...props} />,
+  th: ({node, ...props}) => (
+    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" {...props} />
+  ),
+  tbody: ({node, ...props}) => <tbody className="bg-white divide-y divide-gray-200" {...props} />,
+  tr: ({node, ...props}) => <tr className="hover:bg-gray-50 transition-colors" {...props} />,
+  td: ({node, ...props}) => <td className="px-3 py-2 text-xs text-gray-700 whitespace-normal break-words" {...props} />,
+  
+  // Text styles
+  p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+  strong: ({node, ...props}) => <span className="font-bold text-blue-700" {...props} />,
+  em: ({node, ...props}) => <span className="italic text-gray-600" {...props} />,
+  
+  // List styles
+  ul: ({node, ...props}) => <ul className="list-disc list-outside ml-4 space-y-1 my-2 text-gray-700" {...props} />,
+  ol: ({node, ...props}) => <ol className="list-decimal list-outside ml-4 space-y-1 my-2 text-gray-700" {...props} />,
+  li: ({node, ...props}) => <li className="pl-1" {...props} />,
+  
+  // Code styles
+  code: ({node, inline, className, children, ...props}) => {
+    return inline 
+      ? <code className="bg-gray-100 text-pink-600 px-1 py-0.5 rounded text-xs font-mono border border-gray-200" {...props}>{children}</code>
+      : <div className="mockup-code bg-gray-900 text-gray-100 rounded-lg overflow-hidden my-2 shadow-md">
+          <pre className="p-3 overflow-x-auto text-xs"><code {...props}>{children}</code></pre>
+        </div>
+  },
+  
+  // Blockquote
+  blockquote: ({node, ...props}) => (
+    <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-3 bg-blue-50 text-gray-700 italic rounded-r text-xs shadow-sm" {...props} />
+  ),
+
+  // Headings
+  h1: ({node, ...props}) => <h1 className="text-lg font-bold my-3 text-gray-900 border-b pb-1" {...props} />,
+  h2: ({node, ...props}) => <h2 className="text-md font-bold my-2 text-gray-800" {...props} />,
+  h3: ({node, ...props}) => <h3 className="text-sm font-bold my-2 text-gray-800" {...props} />,
+  
+  // Links
+  a: ({node, ...props}) => <a className="text-blue-600 hover:text-blue-800 underline decoration-blue-300 hover:decoration-blue-800 transition-all" target="_blank" rel="noopener noreferrer" {...props} />,
+};
+
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -91,12 +139,15 @@ const ChatWidget = () => {
                       : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
                   }`}
                 >
-                  <div className={`text-[13.5px] leading-relaxed prose prose-sm max-w-none ${
+                  <div className={`text-[13.5px] leading-relaxed max-w-none ${
                     msg.role === 'user' 
-                      ? 'prose-invert text-white' 
+                      ? 'prose prose-sm prose-invert text-white' 
                       : 'text-gray-800'
                   }`}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      components={msg.role === 'assistant' ? assistantComponents : undefined}
+                    >
                       {msg.content}
                     </ReactMarkdown>
                   </div>

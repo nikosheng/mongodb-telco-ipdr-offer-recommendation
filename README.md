@@ -86,7 +86,7 @@ node generate_daily_ipdr.js <msisdn> <serviceType> <date> [location]
 **Examples:**
 ```bash
 # Generate 24 hours of Travel activity in Japan for 2025-12-29
-node generate_daily_ipdr.js 85290000000 'Travel' 2025-12-29 Japan
+node generate_daily_ipdr.js 85290000007 'Travel' 2026-02-25 Japan
 
 # Generate 24 hours of Travel activity in USA for 2025-12-29
 node generate_daily_ipdr.js 85290000000 'Travel' 2025-12-29 USA

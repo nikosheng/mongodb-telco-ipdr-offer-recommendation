@@ -13,7 +13,11 @@ export const ingestIpdr = async (req, res) => {
     // Trigger user profile update (async, don't wait for response)
     // Also update User current location based on IPDR
     const userUpdate = {
-        currentLocation: processedData.location.coordinates
+        currentLocation: {
+          type: 'Point',
+          coordinates: processedData.location.coordinates.coordinates,
+          country: processedData.location.country
+        }
     };
     await User.findOneAndUpdate({ msisdn: rawData.msisdn }, { $set: userUpdate }, { upsert: true });
 

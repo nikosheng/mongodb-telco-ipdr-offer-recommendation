@@ -5,7 +5,8 @@ const UserSchema = new mongoose.Schema({
   name: String,
   currentLocation: {
     type: { type: String, default: 'Point' },
-    coordinates: [Number]
+    coordinates: [Number],
+    country: String
   },
   // Top 10 longest duration IPDR history
   topIpdrHistory: [{
@@ -21,10 +22,15 @@ const UserSchema = new mongoose.Schema({
   // Customer Journey / Purchase History
   customerJourney: [{
     action: { type: String, enum: ['pushed', 'viewed', 'purchased'], required: true },
-    offerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Offer' },
+    offerId: { type: String },
     offerName: String,
     timestamp: { type: Date, default: Date.now },
     details: String
+  }],
+  // Roaming Plan Usage
+  roaming_plan_usage: [{
+    planName: String,
+    totalUsageMB: Number // in MB
   }]
 });
 

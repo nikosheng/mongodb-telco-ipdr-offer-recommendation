@@ -36,7 +36,7 @@ const userTool = tool(
   },
   {
     name: "user_agent",
-    description: "Get user information from the users collection by msisdn (user ID).",
+    description: "Get detailed user information (including profile, history, usage) by msisdn. Use the 'msisdn' obtained from 'find_high_usage_users_in_region' or other tools.",
     schema: z.object({
       msisdn: z.string().describe("The user's MSISDN (ID)"),
     }),
@@ -74,41 +74,52 @@ const offerTool = tool(
 );
 
 const recommendTool = tool(
-  async ({ userId }) => {
+  async ({ msisdn }) => {
     try {
-      const user = await User.findOne({ msisdn: userId });
+      const user = await User.findOne({ msisdn });
       if (!user) return "User not found.";
 
-      const recommendations = await recommendOffers(userId);
+      const recommendations = await recommendOffers(msisdn);
       if (!recommendations || recommendations.length === 0) {
         return "No suitable offers found for this user.";
       }
 
-      const bestOffer = recommendations[0];
+      // Return top 2 recommendations
+      const topRecommendations = recommendations.slice(0, 2);
       
-      // Construct a reason based on user tags and offer tags/description
-      let reason = "This offer is recommended based on your recent activity patterns.";
-      if (user.tags && user.tags.length > 0 && bestOffer.tags) {
-        const matchingTags = user.tags.filter(tag => 
-          bestOffer.tags.some(ot => ot.toLowerCase().includes(tag.toLowerCase()) || tag.toLowerCase().includes(ot.toLowerCase()))
-        );
-        if (matchingTags.length > 0) {
-          reason = `This offer aligns with your interests in ${matchingTags.slice(0, 3).join(", ")}.`;
-        } else if (user.latestActivitySummary) {
-          reason = `Based on your recent activity: "${user.latestActivitySummary.substring(0, 100)}...", this offer is the best match.`;
-        }
-      } else if (user.latestActivitySummary) {
-        reason = `Based on your recent activity summary, this offer matches your preferences.`;
-      }
+      const results = topRecommendations.map(offer => {
+          let reason = offer.recommendationReason;
+          
+          if (!reason) {
+              // Default reason if not provided by the service
+              reason = "This offer is recommended based on your recent activity patterns.";
+              
+              if (user.tags && user.tags.length > 0 && offer.tags) {
+                const matchingTags = user.tags.filter(tag => 
+                  offer.tags.some(ot => ot.toLowerCase().includes(tag.toLowerCase()) || tag.toLowerCase().includes(ot.toLowerCase()))
+                );
+                if (matchingTags.length > 0) {
+                  reason = `This offer aligns with your interests in ${matchingTags.slice(0, 3).join(", ")}.`;
+                } else if (user.latestActivitySummary) {
+                  reason = `Based on your recent activity: "${user.latestActivitySummary.substring(0, 100)}...", this offer is the best match.`;
+                }
+              } else if (user.latestActivitySummary) {
+                reason = `Based on your recent activity summary, this offer matches your preferences.`;
+              }
+          }
+
+          return {
+            id: offer._id,
+            name: offer.name,
+            description: offer.description,
+            tags: offer.tags,
+            recommendationReason: reason,
+            score: offer.score
+          };
+      });
 
       return JSON.stringify({
-        bestOffer: {
-          id: bestOffer._id,
-          name: bestOffer.name,
-          description: bestOffer.description,
-          tags: bestOffer.tags
-        },
-        recommendationReason: reason
+        recommendations: results
       });
     } catch (error) {
       return `Error getting recommendations: ${error.message}`;
@@ -116,9 +127,9 @@ const recommendTool = tool(
   },
   {
     name: "recommend_agent",
-    description: "Recommend the single best offer to a user based on their ID (msisdn) and provide a reason.",
+    description: "Recommend the best offers (up to 2) to a user based on their ID (msisdn). Use the 'msisdn' obtained from other tools.",
     schema: z.object({
-      userId: z.string().describe("The user's MSISDN (ID)"),
+      msisdn: z.string().describe("The user's MSISDN (ID)"),
     }),
   }
 );
@@ -187,6 +198,89 @@ const highValueCustomerTool = tool(
   }
 );
 
+const findHighUsageUsersInRegionTool = tool(
+  async ({ country, minUsageGB, limit = 10 }) => {
+    try {
+      const minUsageMB = minUsageGB * 1024;
+      
+      const pipeline = [
+        {
+          $match: {
+            "roaming_plan_usage": {
+              $elemMatch: {
+                "planName": { $regex: new RegExp(country, "i") },
+                "totalUsageMB": { $gt: minUsageMB }
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            msisdn: 1,
+            name: 1,
+            roaming_plan_usage: {
+              $filter: {
+                input: "$roaming_plan_usage",
+                as: "plan",
+                cond: {
+                  $and: [
+                    { $regexMatch: { input: "$$plan.planName", regex: new RegExp(country, "i") } },
+                    { $gt: ["$$plan.totalUsageMB", minUsageMB] }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        { $unwind: "$roaming_plan_usage" }, // Flatten in case multiple matching plans
+        {
+          $group: {
+            _id: "$msisdn",
+            name: { $first: "$name" },
+            totalUsageMB: { $sum: "$roaming_plan_usage.totalUsageMB" },
+            matchedPlans: { $push: "$roaming_plan_usage.planName" } // Optional: Keep track of plans
+          }
+        },
+        { $sort: { totalUsageMB: -1 } },
+        { $limit: limit },
+        {
+          $project: {
+            msisdn: "$_id",
+            name: 1,
+            usage: { 
+              $concat: [
+                { $toString: { $round: [{ $divide: ["$totalUsageMB", 1024] }, 2] } },
+                " GB" 
+              ] 
+            },
+            _id: 0
+          }
+        }
+      ];
+
+      const users = await User.aggregate(pipeline);
+
+      if (!users || users.length === 0) {
+        return `No users found in ${country} with usage over ${minUsageGB}GB.`;
+      }
+
+      return JSON.stringify(users) + "\n\nIMPORTANT: The 'msisdn' field in the results above represents the user ID. Use this exact 'msisdn' value (e.g. '85290000003') when calling 'user_agent' or 'recommend_agent'. Do NOT use the array index.";
+
+    } catch (error) {
+      return `Error finding users: ${error.message}`;
+    }
+  },
+  {
+    name: "find_high_usage_users_in_region",
+    description: "Find users in a specific region/country whose roaming traffic usage exceeds a certain limit in GB. Returns a list of users with their 'msisdn'.",
+    schema: z.object({
+      country: z.string().describe("The country or region name (e.g., 'Asia', 'US', 'Global')"),
+      minUsageGB: z.number().describe("The minimum traffic usage in GB (e.g., 5)"),
+      limit: z.number().optional().describe("Limit the number of users returned. Default is 10."),
+    }),
+  }
+);
+
 const fulfillmentTool = tool(
   async ({ msisdn, offerId, offerName }) => {
     try {
@@ -240,7 +334,38 @@ const fulfillmentTool = tool(
   }
 );
 
-const tools = [userTool, offerTool, recommendTool, fulfillmentTool, highValueCustomerTool];
+const findUsersInRegionTool = tool(
+  async ({ country, limit = 10 }) => {
+    try {
+      const users = await User.find({
+        "currentLocation.country": { $regex: new RegExp(country, "i") }
+      }).limit(limit);
+
+      if (!users || users.length === 0) {
+        return `No users found currently located in ${country}.`;
+      }
+
+      return JSON.stringify(users.map(u => ({
+        msisdn: u.msisdn,
+        name: u.name,
+        currentLocation: u.currentLocation?.country || "Unknown",
+        tags: u.tags
+      }))) + "\n\nIMPORTANT: The 'msisdn' field in the results above represents the user ID. Use this exact 'msisdn' value when calling 'user_agent' or 'recommend_agent'.";
+    } catch (error) {
+      return `Error finding users in region: ${error.message}`;
+    }
+  },
+  {
+    name: "find_users_in_region",
+    description: "Find users currently located in a specific region or country (e.g., 'Japan', 'USA'). Use this when looking for users in a location without specific usage criteria.",
+    schema: z.object({
+      country: z.string().describe("The country or region name to search for."),
+      limit: z.number().optional().describe("Limit the number of users returned. Default is 10."),
+    }),
+  }
+);
+
+const tools = [userTool, offerTool, recommendTool, fulfillmentTool, highValueCustomerTool, findHighUsageUsersInRegionTool, findUsersInRegionTool];
 const toolNode = new ToolNode(tools);
 
 // 2. Define Model
@@ -279,6 +404,18 @@ const workflow = new StateGraph(MessagesZodState)
 export const graph = workflow.compile();
 
 export const runAgent = async (incomingMessages) => {
-  const finalState = await graph.invoke({ messages: incomingMessages });
+  const systemMessage = new SystemMessage(
+    "You are a helpful Telco AI Assistant. Always format your responses using **Markdown** for better readability.\n" +
+    "- Use **tables** to display lists of data (like users, offers, plans).\n" +
+    "- Use **bold** for key terms, names, and prices.\n" +
+    "- Use `inline code` for technical IDs (like MSISDNs, Offer IDs).\n" +
+    "- Use > blockquotes for important summaries or recommendations.\n" +
+    "- Keep responses concise and professional."
+  );
+
+  // Prepend system message
+  const messages = [systemMessage, ...incomingMessages];
+
+  const finalState = await graph.invoke({ messages });
   return finalState.messages[finalState.messages.length - 1].content;
 };

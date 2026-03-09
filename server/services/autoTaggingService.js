@@ -110,6 +110,15 @@ export const updateUserProfile = async (msisdn, options = { forceUpdate: false }
       topIpdrHistory: lastActivities.slice(0, 10).map(log => log._id)
     };
 
+    // Update user's current location based on the latest IPDR
+    if (lastActivities[0].location) {
+      updateFields.currentLocation = {
+        type: 'Point',
+        coordinates: lastActivities[0].location.coordinates?.coordinates || [],
+        country: lastActivities[0].location.country
+      };
+    }
+
     if (shouldUpdateSummary) {
       console.log(`Triggering summary and embedding update for ${msisdn} (forceUpdate: ${options.forceUpdate}, isMidnight: ${isMidnight})`);
       

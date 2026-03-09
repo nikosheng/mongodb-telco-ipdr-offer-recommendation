@@ -4,6 +4,7 @@ const OfferSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
   descriptionEmbedding: [Number], // Embedding for natural language matching
+  limitGB: Number, // Data limit in GB
   tags: [{type: String}]
 });
 
