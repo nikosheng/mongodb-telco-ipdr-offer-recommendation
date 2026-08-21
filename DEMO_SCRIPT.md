@@ -31,6 +31,13 @@ Run these commands before the audience arrives.
 make install
 ```
 
+**Seed the database (first time only):**
+```bash
+make seed
+```
+
+This seeds both offers (with voyage-4 embeddings) and users (with 72h of IPDR history) in one command. Run this once before the first demo, or any time you need to reset the database to a clean state.
+
 **Start both server and client with a single command:**
 ```bash
 make dev

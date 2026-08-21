@@ -40,8 +40,9 @@ make dev
 | `make server` | Start backend only |
 | `make client` | Start frontend only |
 | `make install` | `npm install` in both `server/` and `client/` |
-| `make seed` | Seed the database with full user history data |
-| `make seed-offers` | Seed/re-seed all offers with real voyage-4 embeddings |
+| `make seed` | Seed everything: offers (voyage-4 embeddings) then users (full IPDR history) |
+| `make seed-offers` | Seed/re-seed offers only with voyage-4 embeddings |
+| `make seed-users` | Seed/re-seed users only with full IPDR history |
 | `make stop` | Kill processes on ports 5001 and 5173 |
 
 ### Manual Setup
@@ -205,10 +206,19 @@ The system requires two Atlas Vector Search indexes configured with **1024 dimen
 
 ### After Creating the Indexes
 
-Re-seed all offers with real `voyage-4` embeddings so the `descriptionEmbedding` field contains valid 1024-dim vectors:
+Seed both offers and users in one command:
 
 ```bash
-make seed-offers
+make seed
+```
+
+This runs `make seed-offers` (offers with voyage-4 embeddings) followed by `make seed-users` (10 users with 72h IPDR history). Offers are seeded first so that user profiling can match against valid offer embeddings.
+
+To re-seed each independently:
+
+```bash
+make seed-offers   # offers only — use when offer data/embeddings need refreshing
+make seed-users    # users only — use when user IPDR history needs refreshing
 ```
 
 To re-embed all existing users (if users already have a `latestActivitySummary` but their embeddings are stale or wrong-dimension):
