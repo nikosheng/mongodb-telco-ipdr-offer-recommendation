@@ -24,21 +24,32 @@
 
 ## 1. Pre-Demo Setup
 
-Run these commands before the audience arrives. Keep two terminal windows open.
+Run these commands before the audience arrives.
 
-**Terminal 1 — Backend:**
+**Install dependencies (first time only):**
 ```bash
-cd server
-npm run dev
-# Server starts on http://localhost:5001
+make install
 ```
 
-**Terminal 2 — Frontend:**
+**Start both server and client with a single command:**
 ```bash
-cd client
-npm run dev
-# Client starts on http://localhost:5173
+make dev
 ```
+
+This launches both the backend (port 5001) and frontend (port 5173) concurrently in one terminal, with color-coded `[SERVER]` / `[CLIENT]` prefixed output. Press `Ctrl+C` to stop both.
+
+```
+[SERVER] Connected to MongoDB
+[SERVER] Server running on port 5001
+[CLIENT] VITE ready in 300ms
+[CLIENT] Local: http://localhost:5173
+```
+
+> **If you need to start them separately:**
+> ```bash
+> make server   # backend only
+> make client   # frontend only
+> ```
 
 Open **http://localhost:5173** in a browser. You will see a two-panel layout:
 - **Left sidebar** — search bar, user insight panels, offer cards, activity log

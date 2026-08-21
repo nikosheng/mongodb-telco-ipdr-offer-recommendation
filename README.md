@@ -12,8 +12,40 @@ This project is a full-stack application for analyzing IPDR data and recommendin
 ### Prerequisites
 - Node.js installed
 - MongoDB instance running (Local or Atlas)
+- `make` available (pre-installed on macOS and Linux)
 
-### 1. Backend Setup
+### Quick Start (Recommended)
+
+Install dependencies for both server and client, then start everything with a single command:
+
+```bash
+# 1. Install all dependencies
+make install
+
+# 2. Configure environment variables
+#    Edit server/.env and set MONGODB_URI, AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT
+
+# 3. Seed the database (first time only)
+make seed
+
+# 4. Start both server and client
+make dev
+```
+
+`make dev` launches both processes concurrently with color-coded output. Press `Ctrl+C` to stop both.
+
+| Command | Description |
+|---------|-------------|
+| `make dev` | Start server (port 5001) + client (port 5173) |
+| `make server` | Start backend only |
+| `make client` | Start frontend only |
+| `make install` | `npm install` in both `server/` and `client/` |
+| `make seed` | Seed the database with full history data |
+| `make stop` | Kill processes on ports 5001 and 5173 |
+
+### Manual Setup
+
+#### 1. Backend Setup
 1. Navigate to `server` directory:
    ```bash
    cd server
@@ -35,7 +67,7 @@ This project is a full-stack application for analyzing IPDR data and recommendin
    ```
    Server runs on `http://localhost:5001`.
 
-### 2. Frontend Setup
+#### 2. Frontend Setup
 1. Navigate to `client` directory:
    ```bash
    cd client
