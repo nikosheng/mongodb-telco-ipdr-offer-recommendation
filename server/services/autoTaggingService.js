@@ -67,7 +67,7 @@ const generateUserSummaryAndEmbedding = async (historyText) => {
 
     return {
       summary,
-      embedding: embeddingResponse.embeddings[0],
+      embedding: embeddingResponse.data[0].embedding,
       tags: tags || []
     };
   } catch (error) {

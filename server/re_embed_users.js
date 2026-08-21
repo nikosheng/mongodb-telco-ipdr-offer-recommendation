@@ -22,7 +22,7 @@ async function getEmbedding(text) {
       input: text,
       model: 'voyage-4',
     });
-    return response.embeddings[0];
+    return response.data[0].embedding;
   } catch (error) {
     console.error('Error generating embedding:', error);
     return null;
