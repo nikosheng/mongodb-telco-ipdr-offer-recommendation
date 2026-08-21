@@ -164,7 +164,7 @@ function App() {
   return (
     <div className="flex h-screen w-screen bg-gray-50 text-gray-900 font-sans overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-96 flex flex-col bg-white shadow-xl z-10 border-r border-gray-200">
+      <aside className="w-[32rem] flex flex-col bg-white shadow-xl z-10 border-r border-gray-200">
         <header className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-700 to-indigo-800 text-white">
           <div className="flex items-center gap-3 mb-1">
             <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">

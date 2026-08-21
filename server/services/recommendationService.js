@@ -195,7 +195,7 @@ export const findSimilarUsers = async (userId) => {
                     path: "latestActivitySummaryEmbedding",
                     queryVector: queryVector,
                     numCandidates: 20,
-                    limit: 3 // Limit 6 because the user themselves will likely be the top result
+                    limit: 6 // Fetch 6 because the user themselves will likely be the top result; need buffer to get 3 after self-filter
                 }
             },
             {
