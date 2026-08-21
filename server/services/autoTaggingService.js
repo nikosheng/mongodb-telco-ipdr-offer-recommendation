@@ -1,14 +1,22 @@
 import Ipdr from '../models/Ipdr.js';
 import User from '../models/User.js';
 import { AzureOpenAI } from 'openai';
+import { VoyageAIClient } from 'voyageai';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Azure OpenAI client — used for GPT-4o-mini chat completions (summarization)
 const client = new AzureOpenAI({
   apiKey: process.env.AZURE_OPENAI_API_KEY,
   endpoint: process.env.AZURE_OPENAI_ENDPOINT,
   apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2023-05-15',
+});
+
+// Voyage AI client — used for voyage-4 embeddings (1024-dim) via MongoDB AI endpoint
+const voyageClient = new VoyageAIClient({
+  apiKey: process.env.VOYAGE_API_KEY,
+  baseUrl: process.env.VOYAGE_API_BASE_URL || 'https://ai.mongodb.com/v1',
 });
 
 /**
@@ -20,7 +28,7 @@ const generateUserSummaryAndEmbedding = async (historyText) => {
       console.warn('Azure OpenAI API Key not set, using mock summary and embedding');
       return {
         summary: `Mock summary of activities: ${historyText.substring(0, 100)}...`,
-        embedding: Array.from({ length: 1536 }, () => Math.random()),
+        embedding: Array.from({ length: 1024 }, () => Math.random()),
         tags: ['Mock Location', 'Mock Service', 'example.com']
       };
     }
@@ -51,22 +59,22 @@ const generateUserSummaryAndEmbedding = async (historyText) => {
 
     const { summary, tags } = parsedContent;
 
-    // 2. Generate Embedding for the Summary
-    const embeddingResponse = await client.embeddings.create({
+    // 2. Generate Embedding for the Summary using Voyage AI voyage-4 (1024-dim)
+    const embeddingResponse = await voyageClient.embed({
       input: summary,
-      model: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'text-embedding-3-small',
+      model: 'voyage-4',
     });
 
     return {
       summary,
-      embedding: embeddingResponse.data[0].embedding,
+      embedding: embeddingResponse.embeddings[0],
       tags: tags || []
     };
   } catch (error) {
     console.error('Error generating summary or embedding:', error);
     return {
       summary: 'Error generating summary',
-      embedding: Array.from({ length: 1536 }, () => Math.random()),
+      embedding: Array.from({ length: 1024 }, () => Math.random()),
       tags: []
     };
   }

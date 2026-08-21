@@ -40,7 +40,8 @@ make dev
 | `make server` | Start backend only |
 | `make client` | Start frontend only |
 | `make install` | `npm install` in both `server/` and `client/` |
-| `make seed` | Seed the database with full history data |
+| `make seed` | Seed the database with full user history data |
+| `make seed-offers` | Seed/re-seed all offers with real voyage-4 embeddings |
 | `make stop` | Kill processes on ports 5001 and 5173 |
 
 ### Manual Setup
@@ -145,7 +146,74 @@ node generate_single_ipdr.js 85290000000 Gaming 2025-12-30T10:00:00Z
 The system automatically builds user profiles based on their IPDR activity:
 - **Activity Summary**: A natural language summary of the user's recent 24 activities generated via Azure OpenAI GPT models.
 - **Dynamic Tags**: Automatically generated tags covering locations, service types, and the top 3 visited URL domain hostnames.
-- **Summary Embedding**: A vector representation of the summary (using `text-embedding-3-small`) used for offer recommendation.
-- **Vector Search**: Recommendations are powered by MongoDB Atlas Vector Search (with a local fallback) matching the summary embedding against offer description embeddings.
+- **Summary Embedding**: A 1024-dimensional vector representation of the summary generated using **Voyage AI `voyage-4`** (via the MongoDB AI endpoint `https://ai.mongodb.com/v1`), used for offer recommendation and similar user discovery.
+- **Vector Search**: Recommendations are powered by MongoDB Atlas Vector Search (with a local cosine-similarity fallback) matching the user's summary embedding against offer description embeddings.
 - **Midnight Update Rule**: To optimize costs, automated background profiling (via `/api/ipdr`) only triggers AI summarization during the **midnight window (00:00 - 00:59 UTC)**. Manual generation scripts bypass this rule and force an update immediately.
+
+---
+
+## MongoDB Atlas Vector Search Index Setup
+
+The system requires two Atlas Vector Search indexes configured with **1024 dimensions** to match the `voyage-4` embedding model output. This is a one-time manual setup in the Atlas UI.
+
+> **When to do this:** First-time setup, or if you see the error:
+> `vector field is indexed with 1024 dimensions but queried with 1536`
+
+### Steps
+
+1. Log in to [MongoDB Atlas](https://cloud.mongodb.com) and open your cluster
+2. Navigate to **Atlas Search** → **Create Search Index**
+3. Select **Atlas Vector Search**, choose **JSON Editor**
+4. Select the correct database (`telco-ipdr`) and collection, paste the JSON below, and click **Create**
+5. Repeat for both collections
+
+---
+
+### Index 1 — `user_summary_embedding` on the `users` collection
+
+```json
+{
+  "fields": [
+    {
+      "type": "vector",
+      "path": "latestActivitySummaryEmbedding",
+      "numDimensions": 1024,
+      "similarity": "cosine"
+    }
+  ]
+}
+```
+
+---
+
+### Index 2 — `offer_embedding` on the `offers` collection
+
+```json
+{
+  "fields": [
+    {
+      "type": "vector",
+      "path": "descriptionEmbedding",
+      "numDimensions": 1024,
+      "similarity": "cosine"
+    }
+  ]
+}
+```
+
+---
+
+### After Creating the Indexes
+
+Re-seed all offers with real `voyage-4` embeddings so the `descriptionEmbedding` field contains valid 1024-dim vectors:
+
+```bash
+make seed-offers
+```
+
+To re-embed all existing users (if users already have a `latestActivitySummary` but their embeddings are stale or wrong-dimension):
+
+```bash
+cd server && node re_embed_users.js
+```
 

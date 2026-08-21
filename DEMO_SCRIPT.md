@@ -90,7 +90,7 @@ node generate_daily_ipdr.js 85290000005 'Travel' 2026-08-21 USA
 4. Calls `updateUserProfile()` with `forceUpdate: true`, which:
    - Fetches the latest 24 IPDR records for this user
    - Sends them to **GPT-4o-mini** to generate a plain-language behavioral summary
-   - Generates a **text-embedding-3-small** vector from that summary
+   - Generates a **voyage-4** vector (1024-dim) from that summary via the MongoDB AI endpoint
    - Saves both the summary and the embedding back to the `users` collection
 
 **Expected terminal output:**
@@ -136,7 +136,7 @@ User Profile Updated with new summary and embedding.
   `#Travel` `#USA` `#klook.com` `#trip.com` `#agoda.com`
 
 **What to say:**
-> "Instead of showing a CSR a raw table of thousands of log entries, we run GPT-4o-mini over the user's last 24 IPDR records and produce a plain-language behavioral summary. We also auto-extract structured tags covering location, service category, and the top visited domains. This summary and its vector embedding are what power every downstream feature you're about to see — the similar user matching, the offer ranking, and the chatbot context. It's a semantic understanding of who this user is right now, not just a static demographic profile."
+> "Instead of showing a CSR a raw table of thousands of log entries, we run GPT-4o-mini over the user's last 24 IPDR records and produce a plain-language behavioral summary. We also auto-extract structured tags covering location, service category, and the top visited domains. That summary is then converted into a 1024-dimensional vector using Voyage AI's voyage-4 model — served through the MongoDB AI endpoint. This embedding is what powers every downstream feature you're about to see: similar user matching, offer ranking, and chatbot context. It's a semantic understanding of who this user is right now, not just a static demographic profile."
 
 ---
 
@@ -156,7 +156,7 @@ User Profile Updated with new summary and embedding.
 - Click back (type `85290000005` again) to return to the primary demo user
 
 **What to say:**
-> "We convert each user's activity summary into a high-dimensional vector using OpenAI's text-embedding-3-small model and store it in MongoDB Atlas. When you pull up a user, we run an Atlas Vector Search query — a cosine similarity search across all user embeddings — to find the three most behaviorally similar subscribers. These aren't manually defined segments. The system discovered that these users share the same real-world behavior purely from their network activity. At scale, this means you can identify entire cohorts of roaming travelers, heavy streamers, or business users without writing a single segmentation rule."
+> "We convert each user's activity summary into a 1024-dimensional vector using Voyage AI's voyage-4 model, served through the MongoDB AI endpoint, and store it in MongoDB Atlas. When you pull up a user, we run an Atlas Vector Search query — a cosine similarity search across all user embeddings — to find the three most behaviorally similar subscribers. These aren't manually defined segments. The system discovered that these users share the same real-world behavior purely from their network activity. At scale, this means you can identify entire cohorts of roaming travelers, heavy streamers, or business users without writing a single segmentation rule."
 
 ---
 
@@ -326,6 +326,7 @@ Print or keep this table visible during the demo for quick copy-paste.
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| **Atlas Vector Search error** (`vector field is indexed with 1024 dimensions but queried with 1536`) | Atlas indexes were created with wrong dimension count | Recreate both indexes with `numDimensions: 1024` per the README Atlas setup section, then run `make seed-offers` and `node re_embed_users.js` |
 | **No User Activity Insight text** (card shows "No activity summary available") | AI summary not yet generated for this user | Run `generate_daily_ipdr.js` for this MSISDN — the script force-triggers a profile update |
 | **No Similar Behavior Users shown** | Other users have no embeddings | Run `node seed_full_history.js` from `server/` to seed all 10 users with history and embeddings |
 | **Customer Journey card not appearing** | No journey events written yet | Complete Step 6 (send the offer via chatbot) first, then re-search the user |

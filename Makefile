@@ -1,4 +1,4 @@
-.PHONY: dev server client install seed stop
+.PHONY: dev server client install seed seed-offers stop
 
 dev:
 	@echo "Starting server (port 5001) and client (port 5173)..."
@@ -20,6 +20,9 @@ install:
 
 seed:
 	cd server && node seed_full_history.js
+
+seed-offers:
+	cd server && node seed_offers.js
 
 stop:
 	-lsof -ti:5001 | xargs kill -9

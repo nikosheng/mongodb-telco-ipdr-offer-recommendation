@@ -1,28 +1,28 @@
 
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { AzureOpenAI } from 'openai';
+import { VoyageAIClient } from 'voyageai';
 import User from './models/User.js';
 
 dotenv.config();
 
-const client = new AzureOpenAI({
-  apiKey: process.env.AZURE_OPENAI_API_KEY,
-  endpoint: process.env.AZURE_OPENAI_ENDPOINT,
-  apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2023-05-15',
+// Voyage AI client — voyage-4 embeddings (1024-dim) via MongoDB AI endpoint
+const voyageClient = new VoyageAIClient({
+  apiKey: process.env.VOYAGE_API_KEY,
+  baseUrl: process.env.VOYAGE_API_BASE_URL || 'https://ai.mongodb.com/v1',
 });
 
 async function getEmbedding(text) {
   try {
-    if (!process.env.AZURE_OPENAI_API_KEY || process.env.AZURE_OPENAI_API_KEY === 'your_api_key_here') {
-      console.warn('Azure OpenAI API Key not set, using mock embedding');
-      return Array.from({ length: 1536 }, () => Math.random());
+    if (!process.env.VOYAGE_API_KEY || process.env.VOYAGE_API_KEY === 'your-voyage-api-key') {
+      console.warn('Voyage AI API Key not set, using mock embedding');
+      return Array.from({ length: 1024 }, () => Math.random());
     }
-    const response = await client.embeddings.create({
+    const response = await voyageClient.embed({
       input: text,
-      model: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'text-embedding-3-small',
+      model: 'voyage-4',
     });
-    return response.data[0].embedding;
+    return response.embeddings[0];
   } catch (error) {
     console.error('Error generating embedding:', error);
     return null;
